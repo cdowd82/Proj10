@@ -6,7 +6,11 @@
 </div>
 
 <style>
+    
     .evaluation {
-        background-color: rgb(247, 176, 23);
+        color: white;
+        font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+        font-size: 100px;
     }
+
 </style>

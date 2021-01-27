@@ -8,11 +8,18 @@
   import "firebase/performance";
   import "firebase/analytics";
 
-  // My imports
-  import userBox from '/Users/Chris/Projects/Proj10/src/User.svelte';
+  // Svelte imports
+  import Workup from '/Users/Chris/Projects/Proj10/src/Workup.svelte';
+  import Evaluation from '/Users/Chris/Projects/Proj10/src/Evaluation.svelte';
+  import Procedure from '/Users/Chris/Projects/Proj10/src/Procedure.svelte';
+  import Complete from '/Users/Chris/Projects/Proj10/src/Complete.svelte';
+  import Search from '/Users/Chris/Projects/Proj10/src/Search.svelte';
+  import { fade, fly } from 'svelte/transition'
   import { onMount } from "svelte";
+  
+  // My imports
   import { currentUser } from '/Users/Chris/Projects/Proj10/src/user.js';
-  //let logo = '/Users/Chris/Projects/Proj10/src/image.gif';
+  const logo = "Images/lphArms.png";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAUb9voHyaLgmuTM-FlUnHKQ28XYnRxiRU",
@@ -27,12 +34,12 @@
   let email = '';
   let password = '';
   let showMobileMenu = false; // Show mobile icon and display menu
-  
+
+  // Sign in auth
   function signIn() {
       firebase.auth().signInWithEmailAndPassword(email, password).then((user) => {
           // Signed in. Update login flag
           currentUser.set(email);
-          console.log($currentUser);
           navItems[4].label = $currentUser;
       })
       .catch((error) => {
@@ -42,16 +49,33 @@
       });
   }
 
+  /*   alerts for button testing   */
+  function enterWorkup() {
+    alert("Workup entered");
+  }
+
+  function enterEval() {
+    alert("Eval entered");
+  }
+
+  function enterProcedure() {
+    alert("Procedure entered");
+  }
+
+  function enterComp() {
+    alert("Comp entered");
+  }
+
   // Init firebase
   firebase.initializeApp(firebaseConfig);
 
    // List of navigation items
   const navItems = [
-    { label: "Profile", href: "#" },
+    { label: "Profile", href: "#"},
     { label: "Admin", href: "#" },
     { label: "Contact", href: "#" },
     { label: "About", href: "#" },
-    { label: "User", href: "#" }
+    { label: currentUser, href: "#"}
   ];
   // Mobile menu click event handler
   const handleMobileIconClick = () => (showMobileMenu = !showMobileMenu);
@@ -67,72 +91,93 @@
     const mediaListener = window.matchMedia("(max-width: 767px)");
     mediaListener.addListener(mediaQueryHandler);
   });
+  
 
 </script>
 
-<main>
+<main transition:fly="{{y:200, duration: 1000}}">
   <!-- 1. 🔥 Firebase App -->
   <FirebaseApp {firebase}>
     <User let:user let:auth> 
 
-        <div slot="signed-out">
-          <h1>Liverpool TAViTRAK</h1>
-          <input type="email" bind:value={email} placeholder="Email">
+        <div in:fade="{{y:1000, duration: 2000}}" slot="signed-out">
+          <div><img bottom-margin="0" src={logo} alt="LPH Logo" width="108" height="138"></div>
+          <h1 style="strong">TAVR<sup>2</sup></h1>
+          <br>
+          <input top-margin="0" type="email" bind:value={email} placeholder="Email">
           <br>
           <input type="password" bind:value={password} placeholder="Password">
           <br>
           <button on:click={signIn}>Login</button>
         </div>
 
-        <nav>
-          <div class="inner">
-            <div on:click={handleMobileIconClick} class={`mobile-icon${showMobileMenu ? ' active' : ''}`}>
-              <div class="middle-line"></div>
+        <div transition:fly="{{y:1000, duration: 1200}}">
+          <nav>
+            <div class="inner">
+              <div on:click={handleMobileIconClick} class={`mobile-icon${showMobileMenu ? ' active' : ''}`}>
+                <div class="middle-line"></div>
+              </div>
+              <ul class={`navbar-list${showMobileMenu ? ' mobile' : ''}`}>
+                <li><a href="#"> <div class="nav-tavr">Liverpool-TAVR<sup>2</sup></div></a></li>
+                <li><a href={navItems[0].href}>{navItems[0].label}</a></li>
+                <li><a href={navItems[1].href}>{navItems[1].label}</a></li>
+                <li><a href={navItems[2].href}>{navItems[2].label}</a></li>
+                <li><a href={navItems[3].href}>{navItems[3].label}</a></li>
+                <li><a href={navItems[4].href}>
+                  <button class="logout-Btn" on:click={() => auth.signOut()}>
+                    Logout: {navItems[4].label}</button></a></li>
+              </ul>
             </div>
-            <ul class={`navbar-list${showMobileMenu ? ' mobile' : ''}`}>
-              {#each navItems as item}
-                <li>
-                  <a href={item.href}>{item.label}</a>
-                </li>
-              {/each}
-            </ul>
+          </nav>
+        </div>
+     
+        <div class="container-1">
+          <div class="box-1" transition:fade="{{duration: 2800}}">
+            <button class="enter-workup-btn" on:click={enterWorkup}><Workup/>
           </div>
-        </nav>
+          <div class="box-2" transition:fade="{{duration: 2400}}">
+            <button class="enter-eval-btn" on:click={enterEval}><Evaluation/>
+          </div>
+        </div>
 
-        <p>User = {user.email}</p>
-        <em>Signed in as: {user.email}</em>
-        <br>
-        <br>
-        <button on:click={() => auth.signOut()}>Sign Out</button>
+        <div class="container-1">
+          <div class="box-3" transition:fade="{{duration: 2000}}">
+            <button class="enter-comp-btn" on:click={enterComp}><Complete/>
+          </div>
+          <div class="box-4" transition:fade="{{duration: 1800}}">
+            <button class="enter-procedure-btn" on:click={enterProcedure}><Procedure/>
+          </div>
+        </div>
 
-        <!-- svelte-ignore a11y-missing-attribute -->
-        <!--<img src={logo}>-->
+        <div class="container-2">
+          <div class="box-5" transition:fly="{{y: -1000, duration: 1200}}">
+            <Search/>
+          </div>
+        </div>
 
-        <div class="userBox">
-          <p>This is a userBox</p>
-        <div>
     </User>
   </FirebaseApp>
 </main>
 
 <!-- Styles -->
 <style>
+
   main {
     text-align: center;
     padding: 1em;
     max-width: 240px;
     margin: 0 auto;
+    height: 100%;
   }
 
   h1,
   em {
-    color: #ff3e00;
+    color: hsla(0, 100%, 35%, 0.89);
   }
 
   hr {
     height: 1px;
     border: none;
-    background: rgb(195, 195, 195);
   }
 
   @media (min-width: 640px) {
@@ -144,7 +189,7 @@
   nav {
     background-color: rgba(0, 0, 0, 0.8);
     font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-    height: 45px;
+    height: 50px;
   }
 
   .inner {
@@ -272,5 +317,179 @@
     .navbar-list a {
       display: inline-flex;
     }
+
+    .navbar-list a:hover {
+      background-color: rgba(63, 62, 62, 0.986);
+    }
+
   }
+
+  .logout-Btn {
+    background-color: #343436;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    border: none;
+    color: white;
+    padding-top: 1em
+  }
+
+  h1 {
+    font-size: 75px;
+    font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    color: hsla(0, 100%, 35%, 0.89);
+    margin-top: 0;
+  }
+
+   /* only apply purgecss on utilities, per Tailwind docs */
+  /* purgecss start ignore */
+  @tailwind base;
+  @tailwind components;
+  /* purgecss end ignore */
+
+  @tailwind utilities;
+
+  @media(min-width:468px){
+    .container-1 {
+      display:flex;
+      height: 42%;
+      text-align: center;
+    }
+    
+    .container-2 {
+      display:flex;  
+      text-align: center;
+      justify-content:space-between;
+    }
+  }
+  
+  .container-3 {
+    display:flex;  
+    flex-wrap:wrap;
+    justify-content:space-between;
+  }
+  
+  .container-1 div, .container-2 div, .container-3 div{
+    border: 2px rgb(53, 51, 51) solid;
+    align-content: center;
+  }
+  
+  .box-1{
+    flex:1;
+    order:1;
+    background-color: rgb(253, 86, 86);
+    align-content: center;
+    
+  }
+  
+  .box-2{
+    flex:1;
+    order:2;
+    background-color: rgb(255, 197, 72);
+    align-content: center;
+  }
+  
+  .box-3{
+    flex:1;
+    order: 1;
+    background-color: rgb(59, 76, 235);
+    align-content: center;
+  }
+
+  .box-4{
+    flex:1;
+    order: 2;
+    background-color: rgb(60, 196, 89);
+    align-content: center;
+  }
+
+  .box-5{
+    flex:1;
+    order: 1;
+    background-color: rgba(26, 26, 26, 0.986);
+    align-content: center;
+  }
+  
+  .container-2-box{
+    flex-basis: 27%;  
+  }
+  
+  .container-3-box{
+    flex-basis:12%;
+  }
+
+  .nav-tavr {
+      color:hsla(0, 97%, 77%, 0.89);
+      font-size: 14px;
+      font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  }
+
+  .container-1 .box-1:hover {
+    background-color: rgb(253, 128, 128);
+  }
+
+  .container-1 .box-2:hover {
+    background-color: rgb(255, 215, 129);
+  }
+
+  .container-1 .box-3:hover {
+    background-color: rgb(101, 114, 238);
+  }
+
+  .container-1 .box-4:hover {
+    background-color: rgb(118, 202, 137);
+  }
+
+  .container-2 .box-5:hover {
+    background-color: rgba(63, 62, 62, 0.986);
+  }
+
+  .enter-workup-btn {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(253, 86, 86);
+    align-content: center;
+    border: 0px;
+  }
+
+  .enter-eval-btn {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 197, 72);
+    align-content: center;
+    border: 0px;
+  }
+
+  .enter-procedure-btn {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(60, 196, 89);
+    align-content: center;
+    border: 0px;
+  }
+
+  .enter-comp-btn {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(59, 76, 235);
+    align-content: center;
+    border: 0px;
+  }
+
+
+
+  .container-1 .box-1 .enter-workup-btn:hover {
+    background-color: rgb(253, 128, 128);
+  }
+
+  .container-1 .box-2 .enter-eval-btn:hover {
+    background-color: rgb(255, 215, 129);
+  }
+
+  .container-1 .box-3 .enter-comp-btn:hover {
+    background-color: rgb(101, 114, 238);
+  }
+
+  .container-1 .box-4 .enter-procedure-btn:hover {
+    background-color: rgb(118, 202, 137);
+  }
+
 </style>
